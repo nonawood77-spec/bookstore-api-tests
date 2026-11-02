@@ -1,0 +1,865 @@
+{
+  "info": {
+    "_postman_id": "c75485c1-4b84-4b74-8da0-e6a681b7b86a",
+    "name": "Bookstore Test (CI version)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50996528",
+    "_collection_link": "https://go.postman.co/collection/50996528-c75485c1-4b84-4b74-8da0-e6a681b7b86a?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Authtetication",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});",
+              "",
+              "// save the token so later requests can use it",
+              "const body = pm.response.json();",
+              "pm.collectionVariables.set(\"accessToken\", body.accessToken);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clientName\": \"QA Practice\",\n  \"clientEmail\": \"qa{{$timestamp}}@example.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/api-clients",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "api-clients"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "API status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "const response = pm.response.json();\r",
+              "console.log(response['status']);\r",
+              "\r",
+              "pm.test(\"Status should be OK\", function () {\r",
+              "    pm.expect(response.status).to.eql(\"OK\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/status/",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "status",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "All Book List",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () \r",
+              "{\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "const response = pm.response.json();\r",
+              "console.log (response);\r",
+              "\r",
+              "pm.test(\"Book is found\", function(){\r",
+              "    response.forEach(function(availableBook){\r",
+              "        pm.expect(availableBook.available).to.be.true;\r",
+              "    });\r",
+              "})"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/books/",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "books",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Filtered Book List",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () \r",
+              "{\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// filtering data that not hard code based on variable\r",
+              "const response = pm.response.json();\r",
+              "const selectedBook = response.filter((book) => book.type === \"non-fiction\" && book.available === true);\r",
+              "\r",
+              "// Show all books\r",
+              "//console.log(selectedBook);\r",
+              "\r",
+              "// Use first book ID based on array []\r",
+              "console.log(selectedBook[0]);\r",
+              "\r",
+              "// set the variable to global so that can be used in other tests\r",
+              "// if want to use book id value in other test, at the end of script use = .id\r",
+              "pm.globals.set(\"filtered_book\", selectedBook[0].id);\r",
+              "\r",
+              "//above log >> console.log(selectedBook[0]);>> is \"standard\" log that restored in \"console\", to generate more detail log for \"test result\" tab, we can elaborate by :\r",
+              "const book = selectedBook [0];\r",
+              "//check if book is available and type is non-fiction (as per parameter)\r",
+              "pm.test(\"Book is found\", () =>{\r",
+              "    pm.expect(book).to.be.an('object');\r",
+              "    //pm.expect(book.available).to.be.true;\r",
+              "   // pm.expect(book.available).to.eql(true); // similar with above\r",
+              "   //pm.expect(book.available).to.eql(selectedBook[0].available); // uses the filtered value\r",
+              "    pm.expect(book.type).to.eql(selectedBook[0].type); // use type\r",
+              "})\r",
+              "\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/books/",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "books",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Single Book List",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// to display in test result status based on stock\r",
+              "const response = pm.response.json();\r",
+              "\r",
+              "pm.test(\"selected book is in stock\", function () {\r",
+              "    pm.expect(response['current-stock']).to.be.above(0);\r",
+              "});\r",
+              "\r",
+              "console.log(\"selected book \",response);\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/books/:id",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "books",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "{{filtered_book}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Auto Single Book List",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "// script to display condition in stock or out of stock\r",
+              "const response = pm.response.json();\r",
+              "const stock = response['current-stock'];\r",
+              "\r",
+              "pm.test(\"Check stock status\", function () {\r",
+              "    if (stock > 0) {\r",
+              "        pm.expect(true, `Stock is available: ${stock}`).to.be.true;\r",
+              "    } else {\r",
+              "        pm.expect(false, `Stock is sold out: ${stock}`).to.be.true;\r",
+              "    }\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/books/:id",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "books",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "{{filtered_book}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "BASIC LOGIC",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const storeres = pm.response.json();\r",
+              "\r",
+              "// before writing test check console, is it : object or array, what key exists\r",
+              "// console.log(storeres);\r",
+              "\r",
+              "// check response before writing logic\r",
+              "/* GOAL logic = example is to check whether the stock is available\r",
+              "Before writing logic, always ask:\r",
+              "Step 1 \u2014 What did I receive?\r",
+              "[] \u2192 array \u2192 use filter, map, [0]\r",
+              "{} \u2192 object \u2192 use .field\r",
+              "\r",
+              "Correct patterns (memorize these)\r",
+              "If response is an array\r",
+              "response.filter(item => item.available === true);\r",
+              "response[0].available;\r",
+              "\r",
+              "If response is an object\r",
+              "response.available === true;\r",
+              "*/\r",
+              "\r",
+              "const stock = storeres.filter (function(bookstock){\r",
+              "    return bookstock.available === true && bookstock.type === \"fiction\";})\r",
+              "\r",
+              "\r",
+              "// GOAL Status is 200; Array is not empty; A field exists\r",
+              "/* Pattern:\r",
+              "pm.test(\"description\", () => {\r",
+              "  // expectation\r",
+              "});\r",
+              "*/\r",
+              "pm.test(\"Books API basic validation\", function() {\r",
+              "    pm.response.to.have.status(200); // status 200\r",
+              "    pm.expect(stock.length).to.be.above(0); // not empty\r",
+              "    pm.expect(stock[0]).to.have.property(\"id\"); // field exists\r",
+              "});\r",
+              "//This only tests the first book (stock[0])\r",
+              "const book = stock [0];\r",
+              "pm.test(\"First filtered books in stock are available\", function(){\r",
+              "    pm.expect(book).to.be.an('object');\r",
+              "        pm.expect(book.available).to.eql(true);\r",
+              "    });\r",
+              "// all  book\r",
+              "pm.test(\"All books filtered in stock are available\", function(){\r",
+              "    stock.forEach(function(book){\r",
+              "        pm.expect(book.available).to.eql(true);\r",
+              "    });\r",
+              "});\r",
+              "\r",
+              "\r",
+              "console.log(stock); // shows all log for filtered condition\r",
+              "console.log (stock[0]);// shows log for the first array filtered condition\r",
+              "\r",
+              "// is it need to be saved? save something to be used later\r",
+              "/* Pattern:\r",
+              "pm.environment.set(\"name\", value);\r",
+              "*/\r",
+              "pm.globals.set(\"bookId\", storeres[0].id); // save first book id to use later\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/books/",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "books",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add book Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"bookId\": {{filtered_book}},\r\n  \"customerName\": \"{{$randomUserName}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/orders",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "orders"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add Condition book Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "const response = pm.response.json();\r",
+              "\r",
+              "// ensure orderId created\r",
+              "pm.test(\"Order created successfully\", function () {\r",
+              "    pm.expect(response.created).to.be.true; // check if order was created\r",
+              "});\r",
+              "\r",
+              "// log check\r",
+              "console.log(response.orderId); \r",
+              "\r",
+              "// make global variable\r",
+              "pm.globals.set(\"orderId\", response.orderId);\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"bookId\": {{filtered_book}},\r\n  \"customerName\": \"{{$randomUserName}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/orders",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "orders"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get book Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/orders/",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "orders",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Condition book Order ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () \r",
+              "{\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// 1\ufe0f\u20e3 Parse API response\r",
+              "const responseorder = pm.response.json();\r",
+              "// Converts the response body into JSON and stores in responseorder.\r",
+              "\r",
+              "// 2\ufe0f\u20e3 Inspect response\r",
+              "// Shows full array of orders in console to verify fields and structure.\r",
+              "//console.log(responseorder);\r",
+              "\r",
+              "// 3\ufe0f\u20e3 Extract only order IDs\r",
+              "// Loops through each order object in the array, retrieves `id`, and returns a new array of order IDs.\r",
+              "const orderIds = responseorder\r",
+              ".filter(function(stockorder){\r",
+              "   return stockorder.quantity > 0; \r",
+              "})\r",
+              ".map(function(stockorder){\r",
+              "    return {\r",
+              "        id: stockorder.id ,\r",
+              "        quantity : stockorder.quantity\r",
+              "    };\r",
+              "})\r",
+              "\r",
+              "// 4\ufe0f\u20e3 Log order IDs\r",
+              "console.log(orderIds);\r",
+              "\r",
+              "pm.test(\"Incoming Order more than zero\", function() {\r",
+              "   orderIds.forEach(function (idtotal){\r",
+              "    pm.expect(idtotal.quantity).to.be.above(0);\r",
+              "   })\r",
+              "})"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/orders/",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "orders",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update book Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 204\", function () {\r",
+              "    pm.response.to.have.status(204);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"customerName\": \"Anggria\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/orders/:orderId",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "orders",
+            ":orderId"
+          ],
+          "variable": [
+            {
+              "key": "orderId",
+              "value": "{{orderId}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete book Order",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"customerName\": \"Anggri\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseURL}}/orders/:orderId",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "orders",
+            ":orderId"
+          ],
+          "variable": [
+            {
+              "key": "orderId",
+              "value": "{{filtered_book}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Unavaliable Book",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "//\r",
+              "const Unavail = pm.response.json();\r",
+              "\r",
+              "//#2 logic\r",
+              "\r",
+              "// filter books that are not available\r",
+              "const unavailableBooks = Unavail.filter(book => book.available === false);\r",
+              "let hasUnavailableBooks = false;\r",
+              "\r",
+              "if (unavailableBooks.length > 0) {\r",
+              "    // get the id of the first unavailable book\r",
+              "    const unavailableBookID = unavailableBooks[0];\r",
+              "\r",
+              "    // set the global variable for unavailable book\r",
+              "    pm.globals.set(\"unavailableBook\", unavailableBookID.id);\r",
+              "    // log the unavailable book to the console\r",
+              "    console.log(\"Unavailable Book:\", unavailableBookID);\r",
+              "\r",
+              "    // set flag to true\r",
+              "    hasUnavailableBooks = true;\r",
+              "\r",
+              "} else {\r",
+              "    console.log(\"No unavailable books found.\");\r",
+              "    hasUnavailableBooks = false;\r",
+              "}\r",
+              "//#3 assertion\r",
+              "\r",
+              "\r",
+              "pm.test( \"validate book availability, unavailable book found\", function(){\r",
+              "    pm.response.to.have.status(200);\r",
+              "\r",
+              "    if (hasUnavailableBooks === true){\r",
+              "        // happy path of unavailable books\r",
+              "        pm.expect(unavailableBooks).to.be.an('Array');\r",
+              "        pm.expect(unavailableBooks).to.have.length.above(0);\r",
+              "    }\r",
+              "\r",
+              "    else{\r",
+              "        // control failure path\r",
+              "        pm.expect.fail(\"No unavailable books found\");\r",
+              "    }\r",
+              "}\r",
+              "\r",
+              ")\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/books/",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "books",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "https://simple-books-api.click"
+    }
+  ]
+}
